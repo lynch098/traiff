@@ -1,3 +1,6 @@
+"""
+Credits     : Portions of this code were written with the assistance of ChatGPT o3.
+"""
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -5,7 +8,7 @@ from matplotlib.colors import LinearSegmentedColormap, BoundaryNorm
 import mapclassify
 from scipy.stats import gaussian_kde
 
-# 全局字体设置为 Arial
+#%% 1  Load data
 plt.rcParams['font.family'] = 'Arial'
 
 # 1. 读取数据
