@@ -1,6 +1,7 @@
 """
 Credits     : Portions of this code were written with the assistance of ChatGPT o3.
 """
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,28 +9,27 @@ from matplotlib.colors import LinearSegmentedColormap, BoundaryNorm
 import mapclassify
 from scipy.stats import gaussian_kde
 
-#%% 1  Load data
 plt.rcParams['font.family'] = 'Arial'
 
-# 1. 读取数据
+#%% 1  Load data
 input_path = r"D:"
 df = pd.read_excel(input_path, sheet_name="Sheet1", dtype={'score': float})
 scores = df['score'].dropna().values
 
-# 2. 计算 10 类自然断点
+#%% 2  Compute 10-class natural breaks
 classifier = mapclassify.NaturalBreaks(scores, k=10)
 breaks = classifier.bins
 boundaries = np.concatenate(([scores.min()], breaks))
 
-# 3. 渐变 colormap 与 norm
+#%% 3 Create gradient colormap and normalization
 cmap = LinearSegmentedColormap.from_list('mycmap', ['#55006D', '#FEEEEB'])
 norm = BoundaryNorm(boundaries, ncolors=cmap.N, clip=True)
 
-# 4. 画布与布局
+#%% 4 Set up figure and layout
 fig = plt.figure(figsize=(6, 8))
 gs = fig.add_gridspec(3, 1, height_ratios=[3, 1, 0.2], hspace=0.001)
 
-# 4.1 密度图
+# Density plot
 ax_density = fig.add_subplot(gs[0, 0])
 kde = gaussian_kde(scores)
 x = np.linspace(scores.min(), scores.max(), 500)
@@ -43,7 +43,7 @@ for i in range(len(x)-1):
 
 ax_density.plot(x, y, color='black', lw=1.5)
 
-# 添加参考线并限制高度
+# Add reference lines and adjust vertical limits
 refs = [-0.49, 0.02]
 y_max = y.max()
 ax_density.set_ylim(bottom=-0.1 * y_max, top=y_max * 1.05)
@@ -57,7 +57,7 @@ for spine in ax_density.spines.values():
 ax_density.set_xticks([])
 ax_density.set_yticks([])
 
-# 4.2 箱型图（中）
+# Box plot (middle)
 ax_box = fig.add_subplot(gs[1, 0], sharex=ax_density)
 box = ax_box.boxplot(
     scores,
@@ -75,7 +75,7 @@ for spine in ax_box.spines.values():
 ax_box.set_xticks([])
 ax_box.set_yticks([])
 
-# 4.3 colorbar（下）
+# Colorbar (bottom)
 ax_cbar = fig.add_subplot(gs[2, 0])
 cbar = plt.colorbar(
     plt.cm.ScalarMappable(norm=norm, cmap=cmap),
@@ -87,16 +87,16 @@ cbar = plt.colorbar(
 for spine in ax_cbar.spines.values():
     spine.set_visible(False)
 
-# 刻度
+# Configure colorbar ticks and labels
 ticks = boundaries[::2]
 cbar.set_ticks(ticks)
 cbar.set_ticklabels([f"{t:.2f}" for t in ticks])
 cbar.ax.xaxis.set_tick_params(rotation=0)
 cbar.set_label('Score (Natural Breaks)')
 
-# 5. 保存
+#%% 5 Save figure
 output_path = r"D:\"
 plt.savefig(output_path, dpi=400, bbox_inches='tight', transparent=True)
 plt.close(fig)
 
-print("图已保存到：", output_path)
+print("Figure saved to:", output_path)
